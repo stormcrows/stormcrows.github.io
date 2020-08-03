@@ -58,20 +58,6 @@ const LollipopChart = ({ id, margin, width, height, data, xField, yField, xDomai
         .style("opacity", 0)
     }
 
-    const duration = 2000
-
-    lines
-      .transition()
-      .duration(duration)
-      .delay((_, i) => i * 3)
-      .attr("x1", d => x(d[xField]))
-
-    circles
-      .transition()
-      .duration(duration)
-      .delay((_, i) => i * 3)
-      .attr("cx", d => x(d[xField]))
-
     const tooltip = d3.select(`#${id}`)
       .append("div")
       .style("opacity", 0)
@@ -85,13 +71,28 @@ const LollipopChart = ({ id, margin, width, height, data, xField, yField, xDomai
       .style("border-radius", "5px")
       .style("padding", "10px")
       .style("pointer-events", "none")
+    
+    const stayTip = d3.select(`#${id}`)
+      .append("div")
+      .style("opacity", 0)
+      .style("display", "none")
+      .attr("class", "stayTip")
+      .style("position", "absolute")
+      .style("text-align", "left")
+      .style("background-color", "white")
+      .style("border", "solid")
+      .style("border-width", "1px")
+      .style("border-radius", "5px")
+      .style("padding", "10px")
+      .style("pointer-events", "none")
 
     const mouseover = function (d) {
       tooltip.style("opacity", 1).style("display", "block")
+      stayTip.style("display", "none")
     }
 
     const mousemove = function (d) {
-      tooltip.html(`Popularity of ${d.artists}: ${d.popularity}`)
+      tooltip.html(`Popularity of ${d.artists}: ${d.popularity}%`)
         .style("left", (d3.mouse(this)[0] + 200) + "px")
         .style("top", (y(d[yField]) + 400) + "px")
     }
@@ -102,6 +103,26 @@ const LollipopChart = ({ id, margin, width, height, data, xField, yField, xDomai
     lines.on("mouseover", mouseover)
       .on("mousemove", mousemove)
       .on("mouseleave", mouseleave)
+    
+    const duration = 2000
+
+    lines
+      .transition()
+      .duration(duration)
+      .delay((_, i) => i * 3)
+      .attr("x1", d => x(d[xField]))
+
+    circles
+      .transition()
+      .duration(duration)
+      .delay((_, i) => i * 3)
+      .attr("cx", d => x(d[xField]))
+      .on("end", () => 
+        stayTip.html(`Popularity of ${data[0].artists}: ${data[0].popularity}%`)
+          .style("opacity", 1)
+          .style("display", "block")
+          .style("left", x(data[0][xField]) + 100 + "px")
+          .style("top", "400px"))
 
     return () => d3.select(`#${id}`).select('svg').remove()
   }, [id, margin, width, height, data, xField, yField, xDomain])

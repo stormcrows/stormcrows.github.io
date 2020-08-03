@@ -12,7 +12,7 @@ function App() {
     <SongsScatterSlide />
   ]
 
-  const DEFAULT_SIDE = 0
+  const DEFAULT_SIDE = 1
   const [slide, setSlide] = React.useState(slides[DEFAULT_SIDE])
   const [slideNum, setSlideNum] = React.useState(DEFAULT_SIDE)
 
